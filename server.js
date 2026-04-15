@@ -51,36 +51,46 @@ async function checkWithAI(text) {
                     {
                         role: "user",
                         content: `
-Bạn là hệ thống phân loại nội dung, KHÔNG phải AI trò chuyện.
+You are a strict content classification system.
 
-Nhiệm vụ: Chỉ phân loại nội dung thành đúng 1 nhãn:
-SAFE / REVIEW / UNSAFE
+Your task is to classify a single Vietnamese text into EXACTLY one label:
+SAFE, REVIEW, or UNSAFE.
 
-LUẬT CỨNG (BẮT BUỘC TUÂN THEO):
+You MUST follow this decision process step-by-step:
 
-1. SAFE:
-- Nội dung KHÔNG chứa từ tiêu cực
-- KHÔNG có chê bai, công kích
-- Các câu hỏi về cá nhân (ví dụ: có người yêu chưa, học lớp nào, crush ai) => LUÔN LUÔN là SAFE
+STEP 1 — Check UNSAFE:
+If the text contains ANY of the following:
+- profanity, insults, vulgar language
+- sexual (18+) content
+- direct personal attacks
 
-2. REVIEW:
-- CHỈ khi có từ ngữ tiêu cực rõ ràng (chê, than phiền, đánh giá không tốt)
-- Nếu không chắc chắn => KHÔNG được chọn REVIEW
+→ Output: UNSAFE
 
-3. UNSAFE:
-- CHỈ khi có chửi tục, từ thô tục, 18+, xúc phạm rõ ràng
+STEP 2 — Check REVIEW:
+If the text contains CLEAR negative judgment about a person or thing:
+- criticism, complaints, or negative opinions
+- statements that could harm someone's reputation
 
-QUY TẮC QUAN TRỌNG:
-- TUYỆT ĐỐI KHÔNG suy diễn
-- KHÔNG đoán ý người viết
-- Nếu không thấy từ tiêu cực => bắt buộc chọn SAFE
-- Ưu tiên SAFE trong mọi trường hợp không rõ ràng
+→ Output: REVIEW
 
-OUTPUT:
-Chỉ trả về đúng 1 từ duy nhất:
-SAFE hoặc REVIEW hoặc UNSAFE
-KHÔNG giải thích.
+IMPORTANT:
+- The negativity MUST be explicit (clear negative words or tone)
+- If there is NO clear negative wording → DO NOT choose REVIEW
 
+STEP 3 — Otherwise:
+→ Output: SAFE
+
+STRICT RULES:
+- DO NOT assume hidden meaning
+- DO NOT infer intent
+- DO NOT overthink
+- Questions about someone (e.g. "có người yêu chưa", "học giỏi không") are ALWAYS SAFE
+- If unsure → ALWAYS choose SAFE
+
+OUTPUT FORMAT:
+Return ONLY one word:
+SAFE or REVIEW or UNSAFE
+(no explanation, no extra text)
 Nội dung:
 "{content}"
 Nội dung: "${text}"
