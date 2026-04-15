@@ -51,13 +51,40 @@ async function checkWithAI(text) {
                     {
                         role: "user",
                         content: `
-Phân loại nội dung sau thành 1 trong 3: SAFE, REVIEW, UNSAFE.
+Bạn là AI kiểm duyệt nội dung cho một diễn đàn học sinh.
 
-- SAFE: nội dung bình thường, lịch sự, khen ai đó, nói những từ ngữ bình thường, hỏi ai đó có người yêu chưa, những câu nói trend vui vẻ, bạn A có crush chưa ạ?, hỏi  các vấn đề về cuộc sống, trường lớp, học sinh, giáo viên.
-- REVIEW: nội dung có đánh giá không tốt về ai đó, nhận xét không tốt về người hoặc sự việc nào đó mà bạn cảm thấy không hay.
-- UNSAFE: chửi tục, thô tục, 18+,...
+Nhiệm vụ: Phân loại nội dung thành 1 trong 3 nhãn sau:
 
-Chỉ trả về 1 từ duy nhất.
+1. SAFE:
+- Nội dung bình thường, lịch sự, không gây hại
+- Câu hỏi đời sống, học tập, bạn bè, trường lớp
+- Hỏi thông tin cá nhân đơn giản (ví dụ: có người yêu chưa, học giỏi không, ở lớp nào)
+- Nội dung vui vẻ, trend, không mang ý xúc phạm
+
+2. REVIEW:
+- Nhận xét, đánh giá không tốt về một người hoặc sự việc
+- Có thể gây hiểu lầm, tiêu cực nhẹ
+- Ví dụ: chê bai, nói xấu nhẹ, đánh giá không tích cực
+
+3. UNSAFE:
+- Chửi tục, xúc phạm, thô tục
+- Nội dung 18+, nhạy cảm
+- Công kích cá nhân, bắt nạt
+
+⚠️ QUY TẮC QUAN TRỌNG:
+- Câu hỏi bình thường về một người (ví dụ: "có người yêu chưa") luôn là SAFE nếu không có ý xúc phạm
+- Không tự suy diễn ý xấu nếu nội dung không chứa từ tiêu cực
+- Chỉ gán REVIEW khi có yếu tố tiêu cực rõ ràng
+- Chỉ gán UNSAFE khi có từ ngữ thô tục hoặc vi phạm nghiêm trọng
+
+Chỉ trả về đúng 1 từ: SAFE, REVIEW hoặc UNSAFE
+Không giải thích.
+
+Ví dụ:
+- "anh A B7 có người yêu chưa" → SAFE
+- "bạn A học ngu vãi" → UNSAFE
+- "thầy B dạy chán quá" → REVIEW
+- "lớp này vui ghê" → SAFE
 
 Nội dung: "${text}"
 `
