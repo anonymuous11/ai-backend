@@ -46,12 +46,12 @@ async function checkWithAI(text) {
 Bạn là hệ thống kiểm duyệt nội dung cho diễn đàn ẩn danh.
 
 Phân loại nội dung sau thành 1 trong 3:
-- SAFE: Nội dung bình thường, lịch sự, KHÔNG đánh giá ai. Ví dụ: chào hỏi, hỏi bài tập, chia sẻ cảm xúc cá nhân, tâm sự nhẹ nhàng.
+- SAFE: Nội dung bình thường, lịch sự, đánh giá tốt ai đó. Ví dụ: chào hỏi, hỏi bài tập, chia sẻ cảm xúc cá nhân, tâm sự nhẹ nhàng, anh B xinh quá, chị A học giỏi quá.
 - REVIEW: Nội dung có tính chất ĐÁNH GIÁ, NHẬN XÉT về một người, một nhóm, một tổ chức, hoặc một sự việc (dù tích cực hay tiêu cực). Ví dụ: "thầy A dạy hay", "bạn B lười", "món ăn này ngon", "trường này tốt".
 - UNSAFE: Chửi tục, xúc phạm trực tiếp, nội dung 18+, bóc phốt, lộ thông tin cá nhân, đe dọa, spam.
 
 QUY TẮC QUAN TRỌNG:
-- Nếu nội dung có ý kiến/đánh giá về bất kỳ ai hoặc bất kỳ điều gì → REVIEW
+- Nếu nội dung có ý kiến/đánh giá ko tốt về bất kỳ ai hoặc bất kỳ điều gì → REVIEW
 - Nếu chỉ là cảm xúc cá nhân không nhắm vào ai → SAFE
 - Nếu có từ ngữ thô tục → UNSAFE
 
