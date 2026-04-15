@@ -9,22 +9,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-/* =========================
-   🔥 LỌC NHANH (FREE)
-========================= */
-function quickFilter(text) {
-    const badWords = ["địt", "dm", "lồn", "cc", "đm", "cặc", "đụ", "hôi lông", "hãm", "chảnh", "ngu"];
-
-    if (badWords.some(w => text.toLowerCase().includes(w))) {
-        return "UNSAFE";
+// ========== FILTER CỨNG ==========
+function hardFilter(text) {
+    const lowerText = text.toLowerCase();
+    
+    // Từ an toàn -> SAFE
+    const safeWords = ["chào", "hello", "xin chào", "cảm ơn", "cám ơn", "tôi khỏe", "giúp tôi", "bài tập", "học bài", "làm bài"];
+    for (let word of safeWords) {
+        if (lowerText.includes(word)) {
+            return "SAFE";
+        }
     }
-
-    return "PASS";
+    
+    // Từ thô tục -> UNSAFE
+    const unsafeWords = ["địt", "dm", "lồn", "cc", "cặc", "đụ", "duma", "dit me", "loz", "lon", "đĩ", "đéo"];
+    for (let word of unsafeWords) {
+        if (lowerText.includes(word)) {
+            return "UNSAFE";
+        }
+    }
+    
+    return null; // Không xác định, cần gọi AI
 }
 
-/* =========================
-   🤖 GỌI GROQ AI
-========================= */
+// ========== GỌI GROQ AI ==========
 async function checkWithAI(text) {
     try {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -43,22 +51,15 @@ async function checkWithAI(text) {
                     {
                         role: "user",
                         content: `
-Bạn là hệ thống kiểm duyệt nội dung cho diễn đàn ẩn danh.
+Phân loại nội dung sau thành 1 trong 3: SAFE, REVIEW, UNSAFE.
 
-Phân loại nội dung sau thành 1 trong 3:
-- SAFE: Nội dung bình thường, lịch sự, đánh giá tốt ai đó. Ví dụ: chào hỏi, hỏi bài tập, chia sẻ cảm xúc cá nhân, tâm sự nhẹ nhàng, anh B xinh quá, chị A học giỏi quá.
-- REVIEW: Nội dung có tính chất ĐÁNH GIÁ, NHẬN XÉT về một người, một nhóm, một tổ chức, hoặc một sự việc (dù tích cực hay tiêu cực). Ví dụ: "thầy A dạy hay", "bạn B lười", "món ăn này ngon", "trường này tốt".
-- UNSAFE: Chửi tục, xúc phạm trực tiếp, nội dung 18+, bóc phốt, lộ thông tin cá nhân, đe dọa, spam.
+- SAFE: nội dung bình thường, lịch sự, khen ai đó, nói những từ ngữ bình thường, ..., nội dung mà bạn cảm thấy bình thường.
+- REVIEW: nội dung có đánh giá không tốt về ai đó, nhận xét không tốt về người hoặc sự việc nào đó mà bạn cảm thấy không hay.
+- UNSAFE: chửi tục, thô tục, 18+,...
 
-QUY TẮC QUAN TRỌNG:
-- Nếu nội dung có ý kiến/đánh giá ko tốt về bất kỳ ai hoặc bất kỳ điều gì → REVIEW
-- Nếu chỉ là cảm xúc cá nhân không nhắm vào ai → SAFE
-- Nếu có từ ngữ thô tục → UNSAFE
+Chỉ trả về 1 từ duy nhất.
 
-Chỉ trả về đúng 1 từ: SAFE, REVIEW, hoặc UNSAFE
-
-Nội dung cần duyệt:
-"${text}"
+Nội dung: "${text}"
 `
                     }
                 ]
@@ -66,67 +67,40 @@ Nội dung cần duyệt:
         });
 
         const data = await res.json();
-        console.log("🔥 AI RESPONSE:", data);
-
-        const aiText = data?.choices?.[0]?.message?.content || "";
-
-        return aiText.trim().toUpperCase();
-    } catch (err) {
-        console.error("❌ AI ERROR:", err);
-        return "REVIEW"; // fallback an toàn
+        const result = data.choices[0].message.content.trim().toUpperCase();
+        
+        // Chuẩn hóa kết quả
+        if (result.includes("SAFE")) return "SAFE";
+        if (result.includes("UNSAFE")) return "UNSAFE";
+        return "REVIEW";
+        
+    } catch (error) {
+        console.error("AI Error:", error);
+        return "REVIEW";
     }
 }
 
-/* =========================
-   🚀 API MODERATE
-========================= */
+// ========== API MODERATE ==========
 app.post("/moderate", async (req, res) => {
-    try {
-        const text = req.body.content || "";
-
-        // 1. lọc nhanh
-        const quick = quickFilter(text);
-        if (quick === "UNSAFE") {
-            return res.json({
-                result: "UNSAFE",
-                source: "filter"
-            });
-        }
-
-        // 2. gọi AI
-        const aiResult = await checkWithAI(text);
-
-        // chuẩn hóa kết quả
-        let finalResult = "REVIEW";
-
-        if (aiResult.includes("SAFE")) finalResult = "SAFE";
-        else if (aiResult.includes("UNSAFE")) finalResult = "UNSAFE";
-        else if (aiResult.includes("REVIEW")) finalResult = "REVIEW";
-
-        res.json({
-            result: finalResult,
-            raw: aiResult,
-            source: "ai"
-        });
-
-    } catch (err) {
-        console.error("❌ SERVER ERROR:", err);
-        res.status(500).json({ error: "Server error" });
+    const text = req.body.content || "";
+    
+    // 1. Filter cứng trước
+    const hardResult = hardFilter(text);
+    if (hardResult) {
+        return res.json({ result: hardResult, source: "hard_filter" });
     }
+    
+    // 2. Gọi AI nếu filter không xác định
+    const aiResult = await checkWithAI(text);
+    res.json({ result: aiResult, source: "ai" });
 });
 
-/* =========================
-   🧪 TEST SERVER
-========================= */
+// ========== TEST SERVER ==========
 app.get("/", (req, res) => {
     res.send("Server OK ✅");
 });
 
-/* =========================
-   🚀 RUN SERVER
-========================= */
-const PORT = 3000;
-
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server chạy tại http://localhost:${PORT}`);
+    console.log(`🚀 Server chạy tại port ${PORT}`);
 });
