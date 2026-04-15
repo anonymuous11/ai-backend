@@ -51,41 +51,38 @@ async function checkWithAI(text) {
                     {
                         role: "user",
                         content: `
-Bạn là AI kiểm duyệt nội dung cho một diễn đàn học sinh.
+Bạn là hệ thống phân loại nội dung, KHÔNG phải AI trò chuyện.
 
-Nhiệm vụ: Phân loại nội dung thành 1 trong 3 nhãn sau:
+Nhiệm vụ: Chỉ phân loại nội dung thành đúng 1 nhãn:
+SAFE / REVIEW / UNSAFE
+
+LUẬT CỨNG (BẮT BUỘC TUÂN THEO):
 
 1. SAFE:
-- Nội dung bình thường, lịch sự, không gây hại
-- Câu hỏi đời sống, học tập, bạn bè, trường lớp
-- Hỏi thông tin cá nhân đơn giản (ví dụ: có người yêu chưa, học giỏi không, ở lớp nào)
-- Nội dung vui vẻ, trend, không mang ý xúc phạm
+- Nội dung KHÔNG chứa từ tiêu cực
+- KHÔNG có chê bai, công kích
+- Các câu hỏi về cá nhân (ví dụ: có người yêu chưa, học lớp nào, crush ai) => LUÔN LUÔN là SAFE
 
 2. REVIEW:
-- Nhận xét, đánh giá không tốt về một người hoặc sự việc
-- Có thể gây hiểu lầm, tiêu cực nhẹ
-- Ví dụ: chê bai, nói xấu nhẹ, đánh giá không tích cực
+- CHỈ khi có từ ngữ tiêu cực rõ ràng (chê, than phiền, đánh giá không tốt)
+- Nếu không chắc chắn => KHÔNG được chọn REVIEW
 
 3. UNSAFE:
-- Chửi tục, xúc phạm, thô tục
-- Nội dung 18+, nhạy cảm
-- Công kích cá nhân, bắt nạt
+- CHỈ khi có chửi tục, từ thô tục, 18+, xúc phạm rõ ràng
 
-⚠️ QUY TẮC QUAN TRỌNG:
-- Câu hỏi bình thường về một người (ví dụ: "có người yêu chưa") luôn là SAFE nếu không có ý xúc phạm
-- Không tự suy diễn ý xấu nếu nội dung không chứa từ tiêu cực
-- Chỉ gán REVIEW khi có yếu tố tiêu cực rõ ràng
-- Chỉ gán UNSAFE khi có từ ngữ thô tục hoặc vi phạm nghiêm trọng
+QUY TẮC QUAN TRỌNG:
+- TUYỆT ĐỐI KHÔNG suy diễn
+- KHÔNG đoán ý người viết
+- Nếu không thấy từ tiêu cực => bắt buộc chọn SAFE
+- Ưu tiên SAFE trong mọi trường hợp không rõ ràng
 
-Chỉ trả về đúng 1 từ: SAFE, REVIEW hoặc UNSAFE
-Không giải thích.
+OUTPUT:
+Chỉ trả về đúng 1 từ duy nhất:
+SAFE hoặc REVIEW hoặc UNSAFE
+KHÔNG giải thích.
 
-Ví dụ:
-- "anh A B7 có người yêu chưa" → SAFE
-- "bạn A học ngu vãi" → UNSAFE
-- "thầy B dạy chán quá" → REVIEW
-- "lớp này vui ghê" → SAFE
-
+Nội dung:
+"{content}"
 Nội dung: "${text}"
 `
                     }
