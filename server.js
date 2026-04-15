@@ -53,7 +53,7 @@ async function checkWithAI(text) {
                         content: `
 Phân loại nội dung sau thành 1 trong 3: SAFE, REVIEW, UNSAFE.
 
-- SAFE: nội dung bình thường, lịch sự, khen ai đó, nói những từ ngữ bình thường, ..., nội dung mà bạn cảm thấy bình thường.
+- SAFE: nội dung bình thường, lịch sự, khen ai đó, nói những từ ngữ bình thường, hỏi ai đó có người yêu chưa, những câu nói trend vui vẻ, bạn A có crush chưa ạ?, hỏi  các vấn đề về cuộc sống, trường lớp, học sinh, giáo viên.
 - REVIEW: nội dung có đánh giá không tốt về ai đó, nhận xét không tốt về người hoặc sự việc nào đó mà bạn cảm thấy không hay.
 - UNSAFE: chửi tục, thô tục, 18+,...
 
