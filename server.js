@@ -17,7 +17,7 @@ function hardFilter(text) {
     // 1. UNSAFE (ưu tiên cao nhất)
     const unsafeWords = [
         "địt","dm","dmm","lồn","cặc","đụ","duma","dit me",
-        "loz","lon","đĩ","đéo","fuck","shit"
+        "loz","lon","đĩ","đéo","fuck","shit","chịch","sex","dâm"
     ];
     if (unsafeWords.some(w => lower.includes(w))) {
         return "UNSAFE";
